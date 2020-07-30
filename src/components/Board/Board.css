@@ -1,0 +1,87 @@
+#board {
+  width: 50%;
+  min-width: 360px;
+  padding: 0.1em;
+  display: flex;
+  flex-direction: row;
+}
+.board-col {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+}
+.board-col:hover {
+  background-color: dimgrey;
+}
+.board-cell {
+  display: flex;
+  margin: 0.1em;
+  padding: 0.2em;
+  border: solid black;
+  justify-content: center;
+  width: auto;
+}
+.circle {
+  border-radius: 50%;
+  border: 3px solid black;
+  width: 5vw;
+  height: 5vw;
+}
+.red {
+  background-color: red;
+}
+.yellow {
+  background-color: yellow;
+}
+.empty {
+  background-color: transparent;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* #board {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  width: max-content;
+}
+.board-cell {
+  display: flex;
+  border: solid;
+  flex: 1;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+}
+.board-col {
+  display: inline-flex;
+  flex: 1;
+  min-width: 55px;
+  flex-direction: column-reverse;
+}
+.board-col:hover {
+  background-color: teal;
+} */

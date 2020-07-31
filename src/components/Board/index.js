@@ -12,6 +12,8 @@ class Board extends Component {
         super(props);
         this.state = {
             player: 'r',
+            gameStateLabel: `It is ${players['r']}'s turn`,
+            gameActive: true,
             board: [
                 ['x', 'x', 'x', 'x', 'x', 'x'],
                 ['x', 'x', 'x', 'x', 'x', 'x'],
@@ -26,6 +28,8 @@ class Board extends Component {
     resetGame = () => {
         this.setState({
             player: 'r',
+            gameStateLabel: `It is ${players['r']}'s turn`,
+            gameActive: true,
             board: [
                 ['x', 'x', 'x', 'x', 'x', 'x'],
                 ['x', 'x', 'x', 'x', 'x', 'x'],
@@ -38,8 +42,12 @@ class Board extends Component {
     }
 
     changePlayer = () => {
-        if (this.state.player === 'r') this.setState({ player: 'y' });
-        else this.setState({ player: 'r' });
+        let newPlayer = 'r';
+        if (this.state.player === 'r') newPlayer = 'y';
+        this.setState({
+            player: newPlayer,
+            gameStateLabel: `It is ${players[newPlayer]}'s turn`
+        });
     }
 
     makeMove = (colIndex) => {
@@ -63,11 +71,9 @@ class Board extends Component {
         const { player } = this.state;
         // Checks for win condition or tie, else game continues
         if (this.checkWin()) {
-            alert(`${players[player]} player won!`);
-            this.resetGame();
+            this.setState({ gameStateLabel: `${players[player]} won!`, gameActive: false });
         } else if (this.boardIsFull()) {
-            alert(`It was a tie!`);
-            this.resetGame();
+            this.setState({ gameStateLabel: `It was a tie!`, gameActive: false });
         }
         else {
             this.changePlayer();
@@ -140,16 +146,17 @@ class Board extends Component {
     }
 
     colClicked = e => {
+        if (!this.state.gameActive) return;
         this.makeMove(parseInt(e.target.getAttribute('colindex')));
     }
 
     render() {
-        const { board, player } = this.state;
+        const { board, gameStateLabel } = this.state;
 
         return (
             <>
                 <button className='btn' onClick={this.resetGame}>Reset Game</button>
-                <div style={{ marginTop: '0.2em' }}>It is {players[player]}'s turn</div>
+                <div style={{ marginTop: '0.2em' }}>{gameStateLabel}</div>
                 <div id='board'>
                     {board.map((col, i) => (
                         <div className='board-col' key={i} colindex={i} onClick={this.colClicked}>

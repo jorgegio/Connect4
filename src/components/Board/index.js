@@ -148,8 +148,8 @@ class Board extends Component {
 
         return (
             <>
-                <button onClick={this.resetGame}>Reset Game</button>
-                <div style={{ marginTop: '1em' }}>It is {players[player]}'s turn</div>
+                <button className='btn' onClick={this.resetGame}>Reset Game</button>
+                <div style={{ marginTop: '0.2em' }}>It is {players[player]}'s turn</div>
                 <div id='board'>
                     {board.map((col, i) => (
                         <div className='board-col' key={i} colindex={i} onClick={this.colClicked}>

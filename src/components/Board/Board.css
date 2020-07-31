@@ -10,7 +10,12 @@
   flex: 1;
   flex-direction: column-reverse;
 }
-.board-col:hover {
+@media(hover: hover) and (pointer: fine){
+  .board-col:hover {
+    background-color: dimgrey;
+  }
+}
+.board-col:active {
   background-color: dimgrey;
 }
 .board-cell {

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Board.css';
+import * as game from './gameLogic';
 
 const players = {
     r: 'Red',
@@ -43,47 +44,28 @@ class Board extends Component {
         });
     }
 
-    changePlayer = (player) => {
-        let newPlayer = 'r';
-        if (player === 'r') newPlayer = 'y';
-        return newPlayer;
-    }
-
-    canPlay = (board, colIndex) => {
-        if (colIndex === null || colIndex < 0 || colIndex > 6) return false;
-        let heightIndex = board[colIndex].findIndex(el => el === 'x');
-        return heightIndex !== -1;
-    }
-
-    play = (board, player, colIndex) => {
-        let heightIndex = board[colIndex].findIndex(el => el === 'x');
-        board[colIndex][heightIndex] = player;
-    }
-
     makeMove = colIndex => {
         const { board, player } = this.state;
         // Check if move is valid
-        if (!this.canPlay(board, colIndex)) return;
+        if (!game.canPlay(board, colIndex)) return;
         console.log(`${players[player]} player on col ${colIndex}`);
-        //Deep copy array to avoid modifying state directly
-        let newBoard = JSON.parse(JSON.stringify(board));
         // Update board state with move made
-        this.play(newBoard, player, colIndex);
-        // Checks state of game after the move made
+        let newBoard = game.play(board, player, colIndex);
         this.setState({ board: newBoard });
+        // Checks state of game after the move made
         this.gameStateCheck(newBoard, player);
     }
 
     gameStateCheck = (board, player) => {
         // Checks for win condition or tie, else game continues
-        let winPieces = this.checkWin(board, player);
+        let winPieces = game.checkWin(board, player);
         if (winPieces.length >= 4) {
             this.setState({ gameStateLabel: `${players[player]} won!`, gameActive: false, winningPieces: winPieces });
-        } else if (this.boardIsFull(board)) {
+        } else if (game.boardIsFull(board)) {
             this.setState({ gameStateLabel: `It was a tie!`, gameActive: false });
         }
         else {
-            let newPlayer = this.changePlayer(player);
+            let newPlayer = game.changePlayer(player);
             this.setState({
                 player: newPlayer,
                 gameStateLabel: `It is ${players[newPlayer]}'s turn`
@@ -91,90 +73,8 @@ class Board extends Component {
         }
     }
 
-    checkWin = (board, player) => {
-        if (!board || !player) return [];
-        // Check verticals
-        for (let col = 0; col < board.length; col++) {
-            for (let row = 0; row < 4; row++) {
-                if (board[col][row] === player
-                    && board[col][row + 1] === player
-                    && board[col][row + 2] === player
-                    && board[col][row + 3] === player
-                ) return [
-                    this.coordID(col, row),
-                    this.coordID(col, row + 1),
-                    this.coordID(col, row + 2),
-                    this.coordID(col, row + 3)
-                ];
-            }
-        }
-
-        // Check horizontals
-        for (let row = 0; row < board[0].length; row++) {
-            if (board[3][row] === player) {
-                for (let col = 0; col < 4; col++) {
-                    if (board[col][row] === player
-                        && board[col + 1][row] === player
-                        && board[col + 2][row] === player
-                        && board[col + 3][row] === player
-                    ) return [
-                        this.coordID(col, row),
-                        this.coordID(col + 1, row),
-                        this.coordID(col + 2, row),
-                        this.coordID(col + 3, row)
-                    ];
-                }
-            }
-        }
-
-        let boardHeight = board[0].length - 1;
-        // Check diagonals
-        for (let col = 0; col < 4; col++) {
-            for (let offset = 0; offset < 3; offset++) {
-                // Upwards
-                if (board[col][offset] === player &&
-                    board[col + 1][offset + 1] === player &&
-                    board[col + 2][offset + 2] === player &&
-                    board[col + 3][offset + 3] === player
-                ) return [
-                    this.coordID(col, offset),
-                    this.coordID(col + 1, offset + 1),
-                    this.coordID(col + 2, offset + 2),
-                    this.coordID(col + 3, offset + 3)
-                ];
-
-                // Downwards
-                if (board[col][boardHeight - offset] === player &&
-                    board[col + 1][boardHeight - (offset + 1)] === player &&
-                    board[col + 2][boardHeight - (offset + 2)] === player &&
-                    board[col + 3][boardHeight - (offset + 3)] === player
-                ) return [
-                    this.coordID(col, boardHeight - offset),
-                    this.coordID(col + 1, boardHeight - (offset + 1)),
-                    this.coordID(col + 2, boardHeight - (offset + 2)),
-                    this.coordID(col + 3, boardHeight - (offset + 3))
-                ];
-            }
-        }
-
-        return [];
-    }
-
-    boardIsFull = (board) => {
-        for (const col of board) {
-            if (col[col.length - 1] === 'x') {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    coordID = (col, row) => {
-        return col * 7 + row
-    }
-
     displayCell = (cell, col, row) => {
-        let x = this.state.winningPieces.includes(this.coordID(col, row)) ? <div className='x' colindex={col} /> : '';
+        let x = this.state.winningPieces.includes(game.coordID(col, row)) ? <div className='x' colindex={col} /> : '';
         if (cell === 'r') return <div className='circle red' colindex={col}>{x}</div>
         else if (cell === 'y') return <div className='circle yellow' colindex={col} >{x}</div>
         return <div className='circle empty' colindex={col} />;

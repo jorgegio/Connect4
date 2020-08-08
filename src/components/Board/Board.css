@@ -1,7 +1,5 @@
 #board {
-  width: 50%;
-  min-width: 360px;
-  padding: 0.2em;
+  width: 90vmin;
   background-color: #0060ce;
   border: solid black;
   display: flex;
@@ -21,17 +19,20 @@
   background-color: rgba(0, 0, 0, 0.2);
 }
 .board-cell {
-  display: flex;
-  margin: 0.1em;
-  padding: 0.2em;
-  justify-content: center;
-  width: auto;
+  width: 100%;
+  padding-bottom: 100%;
+  position: relative;
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
 }
 .circle {
   border-radius: 50%;
+  box-sizing: border-box;
   border: 0.3vw solid black;
-  width: 4.5vw;
-  height: 4.5vw;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 .red {
   background-color: red;
@@ -41,4 +42,30 @@
 }
 .empty {
   background-color: white;
+}
+
+.x {
+  position: relative;
+  height: 100%;
+  width: 100%;  /* ...but maintain 1:1 aspect ratio */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.x::before,
+.x::after {
+  position: absolute;
+  content: '';
+  width: 100%;
+  height: 0.3vw; /* cross thickness */
+  background-color: black;
+}
+
+.x::before {
+  transform: rotate(45deg);
+}
+
+.x::after {
+  transform: rotate(-45deg);
 }

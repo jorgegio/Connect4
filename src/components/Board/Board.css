@@ -1,7 +1,7 @@
 #board {
   width: 90vmin;
   background-color: #0060ce;
-  border: solid black;
+  border: solid 0.3vw black;
   display: flex;
   flex-direction: row;
 }
@@ -47,7 +47,7 @@
 .x {
   position: relative;
   height: 100%;
-  width: 100%;  /* ...but maintain 1:1 aspect ratio */
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -58,7 +58,7 @@
   position: absolute;
   content: '';
   width: 100%;
-  height: 0.3vw; /* cross thickness */
+  height: 0.3vw;
   background-color: black;
 }
 

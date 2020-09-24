@@ -1,4 +1,4 @@
-export const boardIsFull = (board) => {
+export const boardIsFull = board => {
     for (const col of board) {
         if (col[col.length - 1] === 'x') {
             return false;
@@ -6,6 +6,18 @@ export const boardIsFull = (board) => {
     }
     return true;
 }
+
+export const firstAvailable = board => {
+    for(const col in board) {
+        if(board[col][board[0].length - 1] === 'x') {
+            return col;
+        }
+    }
+    return -1;
+}
+
+// Returns number of moves from start of game
+export const nbMoves = board => board.reduce((moves, col) => moves + col.reduce((a, cell) => cell !== 'x' ? a + 1 : a , 0), 0);
 
 export const coordID = (col, row) => {
     return col * 7 + row
@@ -31,6 +43,11 @@ export const play = (board, player, colIndex) => {
     return newBoard;
 }
 
+export const isWinningMove = (board, player, colIndex) => {
+    if (!canPlay(board, colIndex)) return false;
+    return checkWin(play(board, player, colIndex), player).length === 4;
+}
+
 export const checkWin = (board, player) => {
     if (!board || !player) return [];
     // Check verticals
@@ -40,7 +57,7 @@ export const checkWin = (board, player) => {
                 && board[col][row + 1] === player
                 && board[col][row + 2] === player
                 && board[col][row + 3] === player
-                ) return [
+            ) return [
                 coordID(col, row),
                 coordID(col, row + 1),
                 coordID(col, row + 2),

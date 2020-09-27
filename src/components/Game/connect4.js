@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Board from './board';
+import SettingsForm from './settingsForm';
 import './connect4.css';
 import * as game from './gameLogic';
-import * as bot from './minimax';
+// import * as bot from './minimax';
 
 const Connect4 = () => {
 
@@ -21,10 +22,25 @@ const Connect4 = () => {
     const [gameActive, setGameActive] = useState(true);
     const [board, setBoard] = useState(Array.from(Array(7), () => new Array(6).fill('x')));
     const [winningPieces, setWinningPieces] = useState([]);
-
+    
+    const updateLabel = () => {
+        // Non mutating version of gameStateCheck, only to update label with current player data
+        let winPieces = game.checkWin(board, player);
+        if (winPieces.length >= 4) {
+            setGameStateLabel(`${players[player].name} won!`);
+        } else if (game.boardIsFull(board)) {
+            setGameStateLabel(`It was a tie!`);
+        }
+        else {
+            setGameStateLabel(`It is ${players[player].name}'s turn`);
+        }
+    }
+    
+    useEffect(updateLabel(), [players]);
+    
     const resetGame = () => {
         setPlayer('r');
-        setGameStateLabel(`It is Red's turn`);
+        setGameStateLabel(`It is ${players.r.name}'s turn`);
         setGameActive(true);
         setBoard(Array.from(Array(7), () => new Array(6).fill('x')));
         setWinningPieces([]);
@@ -59,6 +75,7 @@ const Connect4 = () => {
         }
     }
 
+
     const displayCell = (cell, col, row) => {
         let x = winningPieces.includes(game.coordID(col, row)) ? <div className='x' colindex={col} /> : '';
         if (cell === 'r') return <div className='circle red' colindex={col}>{x}</div>
@@ -74,10 +91,11 @@ const Connect4 = () => {
     return (
         <>
             <button className='btn' onClick={resetGame}>Reset Game</button>
+            <SettingsForm setPlayers={setPlayers}/>
             <div className='gameStateLabel'>{gameStateLabel}</div>
             <Board board={board} colClicked={colClicked} displayCell={displayCell} />
         </>
-    )
+    );
 
 }
 

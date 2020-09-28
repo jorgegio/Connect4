@@ -3,7 +3,7 @@ import Board from './board';
 import SettingsForm from './settingsForm';
 import './connect4.css';
 import * as game from './gameLogic';
-// import * as bot from './minimax';
+import * as bot from './minimax';
 
 const Connect4 = () => {
 
@@ -44,8 +44,9 @@ const Connect4 = () => {
       useEffect(() => {
           if(players[player].type === 'Bot') {
               console.log('Bot should move...');
+            //   bot.move(board, player);
           }
-      }, [player]);
+      }, [player, players]);
 
     const resetGame = () => {
         setPlayer('r');
@@ -104,7 +105,6 @@ const Connect4 = () => {
             <Board board={board} colClicked={colClicked} displayCell={displayCell} />
         </>
     );
-
 }
 
 export default Connect4;

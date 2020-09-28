@@ -41,6 +41,12 @@ const Connect4 = () => {
         updateLabel();
       }, [players]);
 
+      useEffect(() => {
+          if(players[player].type === 'Bot') {
+              console.log('Bot should move...');
+          }
+      }, [player]);
+
     const resetGame = () => {
         setPlayer('r');
         setGameStateLabel(`It is ${players.r.name}'s turn`);

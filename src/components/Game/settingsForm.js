@@ -9,11 +9,11 @@ const SettingsForm = ({setPlayers}) => {
         
         setPlayers({
             r: {
-                name: values.redName.value,
+                name: values.redName.value || 'Red',
                 type: values.redType.value
             },
             y: {
-                name: values.yellowName.value,
+                name: values.yellowName.value || 'Yellow',
                 type: values.yellowType.value
             }
         });
@@ -21,12 +21,12 @@ const SettingsForm = ({setPlayers}) => {
 
     return (
         <form onSubmit={onSubmit}>
-            <input required name="redName" placeholder="Red player name"/>
+            <input name="redName" placeholder="Red player name"/>
             <select name="redType">
                 <option value="Human">Human</option>
                 <option value="Bot">Bot</option>
             </select>
-            <input required name="yellowName" placeholder="Yellow player name"/>
+            <input name="yellowName" placeholder="Yellow player name"/>
             <select name="yellowType">
                 <option value="Human">Human</option>
                 <option value="Bot">Bot</option>

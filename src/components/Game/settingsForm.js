@@ -34,7 +34,6 @@ const SettingsForm = ({setPlayers}) => {
             <button>Submit</button>
         </form>
     );
-
 }
 
 export default SettingsForm;

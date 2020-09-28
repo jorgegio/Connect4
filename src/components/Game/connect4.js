@@ -92,8 +92,8 @@ const Connect4 = () => {
 
     return (
         <>
-            <button className='btn' onClick={resetGame}>Reset Game</button>
             <SettingsForm setPlayers={setPlayers}/>
+            <button onClick={resetGame}>Reset Game</button>
             <div className='gameStateLabel'>{gameStateLabel}</div>
             <Board board={board} colClicked={colClicked} displayCell={displayCell} />
         </>

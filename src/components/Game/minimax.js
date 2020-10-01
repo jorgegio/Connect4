@@ -14,7 +14,7 @@ export const negamax = (board, player, depth) => {
 
     let bestScore = -board.length * board[0].length; // init the best possible score with a lower bound of score.
     let bestMove = 0;
-    
+
     // compute the score of all possible next move and keep the best one
     for (let x = 0; x < board.length; x++) {
         if (game.canPlay(board, x)) {
@@ -32,7 +32,7 @@ export const negamax = (board, player, depth) => {
             }
         }
     }
-    
+
     console.log(`negamax at depth ${depth} got score: `, bestScore);
     return { score: bestScore, move: bestMove };
 }
@@ -49,7 +49,15 @@ export const move = (board, player) => {
     // Checks if win is achievable in 1 move first
     let canWinNextIndex = canWinNext(board, player);
     if (canWinNextIndex !== -1) return canWinNextIndex;
+    let enemyWinsNext = canWinNext(board, game.changePlayer(player));
+    if (enemyWinsNext !== -1) return enemyWinsNext;
 
-    let bestMove = negamax(board, player, 0).move;
+    let bestMove = Math.floor(Math.random() * board.length);
+    while(!game.canPlay(board, bestMove)) {
+        bestMove = Math.floor(Math.random() * board.length);
+    }
     return bestMove;
+
+    // let bestMove = negamax(board, player, 0).move;
+    // return bestMove;
 }

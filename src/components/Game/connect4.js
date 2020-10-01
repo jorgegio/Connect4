@@ -31,22 +31,21 @@ const Connect4 = () => {
             if (winPieces.length >= 4) {
                 setGameStateLabel(`${players[player].name} won!`);
             } else if (game.boardIsFull(board)) {
-                setGameStateLabel(`It was a tie!`);
+                setGameStateLabel('It was a tie!');
             }
             else {
                 setGameStateLabel(`It is ${players[player].name}'s turn`);
             }
         }
-        
-        updateLabel();
-      }, [players]);
 
-      useEffect(() => {
-          if(players[player].type === 'Bot') {
-              console.log('Bot should move...');
-            //   bot.move(board, player);
-          }
-      }, [player, players]);
+        updateLabel();
+    }, [players]);
+
+    useEffect(() => {
+        if (players[player].type === 'Bot') {
+            makeMove(bot.move(board, player));
+        }
+    }, [player, players]);
 
     const resetGame = () => {
         setPlayer('r');
@@ -99,9 +98,9 @@ const Connect4 = () => {
 
     return (
         <>
-            <SettingsForm setPlayers={setPlayers}/>
+            <SettingsForm setPlayers={setPlayers} />
             <button onClick={resetGame}>Reset Game</button>
-            <div className='gameStateLabel'>{gameStateLabel}</div>
+            <div className={`gameStateLabel ${gameStateLabel === 'It was a tie!' ? 'tie' : `${player}Player`}`}>{gameStateLabel}</div>
             <Board board={board} colClicked={colClicked} displayCell={displayCell} />
         </>
     );

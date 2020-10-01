@@ -42,10 +42,10 @@ const Connect4 = () => {
     }, [players]);
 
     useEffect(() => {
-        if (players[player].type === 'Bot') {
+        if (gameActive && players[player].type === 'Bot') {
             makeMove(bot.move(board, player));
         }
-    }, [player, players]);
+    }, [player, players, gameActive, board]);
 
     const resetGame = () => {
         setPlayer('r');

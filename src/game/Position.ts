@@ -48,18 +48,18 @@
  * non-ambigous representation of the position.
  */
 class Position {
-  public static readonly WIDTH: bigint = BigInt(7); // width of the board
-  public static readonly HEIGHT: bigint = BigInt(6); // height of the board
+  public static readonly WIDTH: bigint = 7n; // width of the board
+  public static readonly HEIGHT: bigint = 6n; // height of the board
 
   public static readonly MIN_SCORE: bigint =
-    -(Position.WIDTH * Position.HEIGHT) / BigInt(2) + BigInt(3);
+    -(Position.WIDTH * Position.HEIGHT) / 2n + 3n;
   public static readonly MAX_SCORE: bigint =
-    (Position.WIDTH * Position.HEIGHT + BigInt(1)) / BigInt(2) - BigInt(3);
+    (Position.WIDTH * Position.HEIGHT + 1n) / 2n - 3n;
 
   constructor() {
-    this.current_position = BigInt(0);
-    this.mask = BigInt(0);
-    this.moves = BigInt(0);
+    this.current_position = 0n;
+    this.mask = 0n;
+    this.moves = 0n;
   }
 
   // Copy constructor
@@ -91,7 +91,7 @@ class Position {
    *
    * @return bigint of played moves. Processing will stop at first invalid move that can be:
    *           - invalid character (non digit, or digit >= WIDTH)
-   *           - playing a colum the is already full
+   *           - playing a column that is already full
    *           - playing a column that makes an alignment (we only solve non).
    *         Caller can check if the move sequence was valid by comparing the bigint of
    *         processed moves to the length of the sequence.
@@ -115,7 +115,7 @@ class Position {
    * return true if current player can win next move
    */
   public canWinNext(): boolean {
-    return (this.winning_position() & this.possible()) !== BigInt(0);
+    return (this.winning_position() & this.possible()) !== 0n;
   }
 
   /**
@@ -136,29 +136,27 @@ class Position {
    * Build a symmetric base 3 key. Two symetric positions will have the same key.
    *
    * This key is a base 3 representation of the sequence of played moves column per column,
-   * from bottom to top. The 3 digits are top_of_colum(0), current_player(1), opponent(2).
+   * from bottom to top. The 3 digits are top_of_column(0), current_player(1), opponent(2).
    *
-   * example: game "45" where player one played colum 4, then player two played column 5
-   * has a representation in base 3 digits : 0 0 0 1 0 2 0 0 0 or : 3*3^3 + BigInt(1)*3^5
+   * example: game "45" where player one played column 4, then player two played column 5
+   * has a representation in base 3 digits : 0 0 0 1 0 2 0 0 0 or : 3*3^3 + 1n*3^5
    *
    * The symetric key is the mimimum key of the two keys built iterating columns from left to righ or right to left.
    *
    * as the last digit is always 0, we omit it and a base 3 key
-   * uses N = (nbMoves + nbColums - BigInt(1)) base 3 digits or N*log2(3) bits.
+   * uses N = (nbMoves + nbColumns - 1n) base 3 digits or N*log2(3) bits.
    */
   public key3(): bigint {
-    let key_forward = BigInt(0);
-    for (let i = BigInt(0); i < Position.WIDTH; i++) {
+    let key_forward = 0n;
+    for (let i = 0n; i < Position.WIDTH; i++) {
       key_forward = this.partialKey3(key_forward, i); // compute key in increasing order of columns
     }
 
-    let key_reverse = BigInt(0);
+    let key_reverse = 0n;
     for (let i: bigint = Position.WIDTH; i--; ) {
       key_reverse = this.partialKey3(key_reverse, i); // compute key in decreasing order of columns
     }
-    return key_forward < key_reverse
-      ? key_forward / BigInt(3)
-      : key_reverse / BigInt(3); // take the smallest key and divide per 3 as the last base3 digit is always 0
+    return key_forward < key_reverse ? key_forward / 3n : key_reverse / 3n; // take the smallest key and divide per 3 as the last base3 digit is always 0
   }
 
   /**
@@ -176,14 +174,13 @@ class Position {
     const opponent_win: bigint = this.opponent_winning_position();
     const forced_moves: bigint = possible_mask & opponent_win;
     if (forced_moves) {
-      if (forced_moves & (forced_moves - BigInt(1)))
+      if (forced_moves & (forced_moves - 1n))
         // check if there is more than one forced move
-        return BigInt(
-          0
-        ); // the opponnent has two winning moves and you cannot stop him
+        return 0n;
+      // the opponnent has two winning moves and you cannot stop him
       else possible_mask = forced_moves; // enforce to play the single forced move
     }
-    return possible_mask & ~(opponent_win >> BigInt(1)); // avoid to play below an opponent winning spot
+    return possible_mask & ~(opponent_win >> 1n); // avoid to play below an opponent winning spot
   }
 
   /**
@@ -206,7 +203,7 @@ class Position {
    * @return true if the column is playable, false if the column is already full.
    */
   public canPlay(col: bigint): boolean {
-    return (this.mask & Position.top_mask_col(col)) === BigInt(0);
+    return (this.mask & Position.top_mask_col(col)) === 0n;
   }
 
   /**
@@ -232,7 +229,7 @@ class Position {
       (this.winning_position() &
         this.possible() &
         Position.column_mask(col)) !==
-      BigInt(0)
+      0n
     );
   }
 
@@ -245,15 +242,15 @@ class Position {
    */
   private partialKey3(key: bigint, col: bigint): bigint {
     for (
-      let pos = BigInt(1) << (col * (Position.HEIGHT + BigInt(1)));
+      let pos = 1n << (col * (Position.HEIGHT + 1n));
       pos & this.mask;
-      pos <<= BigInt(1)
+      pos <<= 1n
     ) {
-      key *= BigInt(3);
-      if (pos & this.current_position) key += BigInt(1);
-      else key += BigInt(2);
+      key *= 3n;
+      if (pos & this.current_position) key += 1n;
+      else key += 2n;
     }
-    key *= BigInt(3);
+    key *= 3n;
 
     return key;
   }
@@ -287,9 +284,9 @@ class Position {
    * counts bigint of bit set to one in a 64bits integer
    */
   private static popcount(m: bigint): bigint {
-    let c = BigInt(0);
+    let c = 0n;
     for (; m; c++) {
-      m &= m - BigInt(1);
+      m &= m - 1n;
     }
     return c;
   }
@@ -305,46 +302,39 @@ class Position {
     mask: bigint
   ): bigint {
     // vertical;
-    let r: bigint =
-      (position << BigInt(1)) &
-      (position << BigInt(2)) &
-      (position << BigInt(3));
+    let r: bigint = (position << 1n) & (position << 2n) & (position << 3n);
 
     //horizontal
     let p: bigint =
-      (position << (Position.HEIGHT + BigInt(1))) &
-      (position << (BigInt(2) * (Position.HEIGHT + BigInt(1))));
-    r |= p & (position << (BigInt(3) * (Position.HEIGHT + BigInt(1))));
-    r |= p & (position >> (Position.HEIGHT + BigInt(1)));
+      (position << (Position.HEIGHT + 1n)) &
+      (position << (2n * (Position.HEIGHT + 1n)));
+    r |= p & (position << (3n * (Position.HEIGHT + 1n)));
+    r |= p & (position >> (Position.HEIGHT + 1n));
     p =
-      (position >> (Position.HEIGHT + BigInt(1))) &
-      (position >> (BigInt(2) * (Position.HEIGHT + BigInt(1))));
-    r |= p & (position << (Position.HEIGHT + BigInt(1)));
-    r |= p & (position >> (BigInt(3) * (Position.HEIGHT + BigInt(1))));
+      (position >> (Position.HEIGHT + 1n)) &
+      (position >> (2n * (Position.HEIGHT + 1n)));
+    r |= p & (position << (Position.HEIGHT + 1n));
+    r |= p & (position >> (3n * (Position.HEIGHT + 1n)));
 
     //diagonal 1
-    p =
-      (position << Position.HEIGHT) &
-      (position << (BigInt(2) * Position.HEIGHT));
-    r |= p & (position << (BigInt(3) * Position.HEIGHT));
+    p = (position << Position.HEIGHT) & (position << (2n * Position.HEIGHT));
+    r |= p & (position << (3n * Position.HEIGHT));
     r |= p & (position >> Position.HEIGHT);
-    p =
-      (position >> Position.HEIGHT) &
-      (position >> (BigInt(2) * Position.HEIGHT));
+    p = (position >> Position.HEIGHT) & (position >> (2n * Position.HEIGHT));
     r |= p & (position << Position.HEIGHT);
-    r |= p & (position >> (BigInt(3) * Position.HEIGHT));
+    r |= p & (position >> (3n * Position.HEIGHT));
 
     //diagonal 2
     p =
-      (position << (Position.HEIGHT + BigInt(2))) &
-      (position << (BigInt(2) * (Position.HEIGHT + BigInt(2))));
-    r |= p & (position << (BigInt(3) * (Position.HEIGHT + BigInt(2))));
-    r |= p & (position >> (Position.HEIGHT + BigInt(2)));
+      (position << (Position.HEIGHT + 2n)) &
+      (position << (2n * (Position.HEIGHT + 2n)));
+    r |= p & (position << (3n * (Position.HEIGHT + 2n)));
+    r |= p & (position >> (Position.HEIGHT + 2n));
     p =
-      (position >> (Position.HEIGHT + BigInt(2))) &
-      (position >> (BigInt(2) * (Position.HEIGHT + BigInt(2))));
-    r |= p & (position << (Position.HEIGHT + BigInt(2)));
-    r |= p & (position >> (BigInt(3) * (Position.HEIGHT + BigInt(2))));
+      (position >> (Position.HEIGHT + 2n)) &
+      (position >> (2n * (Position.HEIGHT + 2n)));
+    r |= p & (position << (Position.HEIGHT + 2n));
+    r |= p & (position >> (3n * (Position.HEIGHT + 2n)));
 
     return r & (Position.board_mask ^ mask);
   }
@@ -352,11 +342,10 @@ class Position {
   // Static bitmaps
   private static bottom(width: bigint, height: bigint): bigint {
     if (width <= 0) {
-      return BigInt(0);
+      return 0n;
     }
     return (
-      this.bottom(width - BigInt(1), height) |
-      (BigInt(1) << ((width - BigInt(1)) * (height + BigInt(1))))
+      this.bottom(width - 1n, height) | (1n << ((width - 1n) * (height + 1n)))
     );
   }
 
@@ -365,27 +354,21 @@ class Position {
     Position.HEIGHT
   );
   private static readonly board_mask: bigint =
-    Position.bottom_mask * ((BigInt(1) << Position.HEIGHT) - BigInt(1));
+    Position.bottom_mask * ((1n << Position.HEIGHT) - 1n);
 
   // return a bitmask containg a single 1 corresponding to the top cel of a given column
   private static top_mask_col(col: bigint): bigint {
-    return (
-      BigInt(1) <<
-      (Position.HEIGHT - BigInt(1) + col * (Position.HEIGHT + BigInt(1)))
-    );
+    return 1n << (Position.HEIGHT - 1n + col * (Position.HEIGHT + 1n));
   }
 
   // return a bitmask containg a single 1 corresponding to the bottom cell of a given column
   private static bottom_mask_col(col: bigint): bigint {
-    return BigInt(1) << (col * (Position.HEIGHT + BigInt(1)));
+    return 1n << (col * (Position.HEIGHT + 1n));
   }
 
   // return a bitmask 1 on all the cells of a given column
   public static column_mask(col: bigint): bigint {
-    return (
-      ((BigInt(1) << Position.HEIGHT) - BigInt(1)) <<
-      (col * (Position.HEIGHT + BigInt(1)))
-    );
+    return ((1n << Position.HEIGHT) - 1n) << (col * (Position.HEIGHT + 1n));
   }
 }
 

@@ -1,4 +1,4 @@
-import MoveSorter from "./MoveSorter";
+import MoveSorter from "./MoveSorter"; 2n
 import Position from "./Position";
 import TranspositionTable from "./TranspositionTable";
 
@@ -6,23 +6,23 @@ class Solver {
   constructor() {
     this.transTable = new TranspositionTable();
     // this.book =
-    this.nodeCount = 0;
+    this.nodeCount = 0n;
     this.columnOrder = [];
 
-    for (let i = 0; i < Position.WIDTH; i++) {
+    for (let i = 0n; i < Position.WIDTH; i++) {
       // initialize the column exploration order, starting with center columns
-      this.columnOrder[i] =
-        Position.WIDTH / 2 + ((1 - 2 * (i % 2)) * (i + 1)) / 2; // example for WIDTH=7: columnOrder = {3, 4, 2, 5, 1, 6, 0}
+      this.columnOrder[Number(i)] =
+        Position.WIDTH / 2n + ((1n - 2n * (i % 2n)) * (i + 1n)) / 2n; // example for WIDTH=7: columnOrder = {3, 4, 2, 5, 1, 6, 0}
     }
   }
 
   private transTable: TranspositionTable;
   //   private book: OpeningBook; // opening book
-  private nodeCount: number; // counter of explored nodes.
-  private columnOrder: number[]; // column exploration order
+  private nodeCount: bigint; // counter of explored nodes.
+  private columnOrder: bigint[]; // column exploration order
 
   /**
-   * Recursively score connect 4 position using negamax variant of alpha-beta algorithm.
+   * Recursively score connect 4n position using negamax variant of alpha-beta algorithm.
    * @param P: position to evaluate, this function assumes nobody already won and
    *         current player cannot win next move. This has to be checked before
    * @param alpha: alpha < beta, a score window within which we are evaluating the position.
@@ -33,46 +33,46 @@ class Solver {
    * - if actual score of position >= beta then beta <= return value <= actual score
    * - if alpha <= actual score <= beta then return value = actual score
    */
-  private negamax(P: Position, alpha: number, beta: number): number {
+  private negamax(P: Position, alpha: bigint, beta: bigint): bigint {
     this.nodeCount++; // increment counter of explored nodes
 
-    const possible: number = P.possibleNonLosingMoves();
+    const possible: bigint = P.possibleNonLosingMoves();
 
     // if no possible non losing move, opponent wins next move
-    if (possible === 0) {
-      return -(Position.WIDTH * Position.HEIGHT - P.nbMoves()) / 2;
+    if (possible === 0n) {
+      return -(Position.WIDTH * Position.HEIGHT - P.nbMoves()) / 2n;
     }
 
     // check for draw game
-    if (P.nbMoves() >= Position.WIDTH * Position.HEIGHT - 2) {
-      return 0;
+    if (P.nbMoves() >= Position.WIDTH * Position.HEIGHT - 2n) {
+      return 0n;
     }
 
-    let min: number = -(Position.WIDTH * Position.HEIGHT - 2 - P.nbMoves()) / 2; // lower bound of score as opponent cannot win next move
+    let min: bigint = -(Position.WIDTH * Position.HEIGHT - 2n - P.nbMoves()) / 2n; // lower bound of score as opponent cannot win next move
     if (alpha < min) {
       alpha = min; // there is no need to keep alpha below our max possible score.
       if (alpha >= beta) return alpha; // prune the exploration if the [alpha;beta] window is empty.
     }
 
-    let max: number = (Position.WIDTH * Position.HEIGHT - 1 - P.nbMoves()) / 2; // upper bound of our score as we cannot win immediately
+    let max: bigint = (Position.WIDTH * Position.HEIGHT - 1n - P.nbMoves()) / 2n; // upper bound of our score as we cannot win immediately
     if (beta > max) {
       beta = max; // there is no need to keep beta above our max possible score.
       if (alpha >= beta) return beta; // prune the exploration if the [alpha;beta] window is empty.
     }
 
-    const key: number = P.key();
+    const key: bigint = P.key();
     const val = this.transTable.get(key);
     if (val) {
-      if (val > Position.MAX_SCORE - Position.MIN_SCORE + 1) {
+      if (val > Position.MAX_SCORE - Position.MIN_SCORE + 1n) {
         // we have an lower bound
-        min = val + 2 * Position.MIN_SCORE - Position.MAX_SCORE - 2;
+        min = val + 2n * Position.MIN_SCORE - Position.MAX_SCORE - 2n;
         if (alpha < min) {
           alpha = min; // there is no need to keep beta above our max possible score.
           if (alpha >= beta) return alpha; // prune the exploration if the [alpha;beta] window is empty.
         }
       } else {
         // we have an upper bound
-        max = val + Position.MIN_SCORE - 1;
+        max = val + Position.MIN_SCORE - 1n;
         if (beta > max) {
           beta = max; // there is no need to keep beta above our max possible score.
           if (alpha >= beta) return beta; // prune the exploration if the [alpha;beta] window is empty.
@@ -82,29 +82,29 @@ class Solver {
 
     // look for solutions stored in opening book
     //   val = book.get(P);
-    //   if(val) return val + Position.MIN_SCORE - 1;
+    //   if(val) return val + Position.MIN_SCORE - 1n;
 
     const moves: MoveSorter = new MoveSorter();
-    for (let i = Position.WIDTH; i--; ) {
+    for (let i = Number(Position.WIDTH); i--;) {
       const move = possible;
       if (move & Position.column_mask(this.columnOrder[i])) {
         moves.add(move, P.moveScore(move));
       }
     }
 
-    let next: number = moves.getNext();
+    let next: bigint = moves.getNext();
     while (next) {
-      const P2: Position = Position.clone(P);
+      const P2n: Position = Position.clone(P);
 
-      P2.play(next); // It's opponent turn in P2 position after current player plays x column.
-      const score: number = -this.negamax(P2, -beta, -alpha); // explore opponent's score within [-beta;-alpha] windows:
+      P2n.play(next); // It's opponent turn in P2n position after current player plays x column.
+      const score: bigint = -this.negamax(P2n, -beta, -alpha); // explore opponent's score within [-beta;-alpha] windows:
       // no need to have good precision for score better than beta (opponent's score worse than -beta)
       // no need to check for score worse than alpha (opponent's score worse better than -alpha)
 
       if (score >= beta) {
         this.transTable.put(
           key,
-          score + Position.MAX_SCORE - 2 * Position.MIN_SCORE + 2
+          score + Position.MAX_SCORE - 2n * Position.MIN_SCORE + 2n
         ); // save the lower bound of the position
         return score; // prune the exploration if we find a possible move better than what we were looking for.
       }
@@ -113,39 +113,39 @@ class Solver {
       next = moves.getNext();
     }
 
-    this.transTable.put(key, alpha - Position.MIN_SCORE + 1); // save the upper bound of the position
+    this.transTable.put(key, alpha - Position.MIN_SCORE + 1n); // save the upper bound of the position
     return alpha;
   }
 
-  public static readonly INVALID_MOVE: number = -1000;
+  public static readonly INVALID_MOVE: bigint = -1000n;
 
   /**
    *  Returns the score of a position
    */
-  public solve(P: Position, weak = false): number {
+  public solve(P: Position, weak = false): bigint {
     // check if win in one move as the Negamax function does not support this case.
     if (P.canWinNext()) {
-      return (Position.WIDTH * Position.HEIGHT + 1 - P.nbMoves()) / 2;
+      return (Position.WIDTH * Position.HEIGHT + 1n - P.nbMoves()) / 2n;
     }
 
-    let min: number = -(Position.WIDTH * Position.HEIGHT - P.nbMoves()) / 2;
-    let max: number = (Position.WIDTH * Position.HEIGHT + 1 - P.nbMoves()) / 2;
+    let min: bigint = -(Position.WIDTH * Position.HEIGHT - P.nbMoves()) / 2n;
+    let max: bigint = (Position.WIDTH * Position.HEIGHT + 1n - P.nbMoves()) / 2n;
     if (weak) {
-      min = -1;
-      max = 1;
+      min = -1n;
+      max = 1n;
     }
 
     while (min < max) {
       // iteratively narrow the min-max exploration window
-      let med: number = min + (max - min) / 2;
-      if (med <= 0 && min / 2 < med) {
-        med = min / 2;
-      } else if (med >= 0 && max / 2 > med) {
-        med = max / 2;
+      let med: bigint = min + (max - min) / 2n;
+      if (med <= 0n && min / 2n < med) {
+        med = min / 2n;
+      } else if (med >= 0n && max / 2n > med) {
+        med = max / 2n;
       }
 
       // use a null depth window to know if the actual score is greater or smaller than med
-      const r = this.negamax(P, med, med + 1);
+      const r = this.negamax(P, med, med + 1n);
       if (r <= med) {
         max = r;
       } else {
@@ -158,30 +158,30 @@ class Solver {
   /** Returns the score off all possible moves of a position as an array.
    * Returns INVALID_MOVE for unplayable columns
    */
-  public analyze(P: Position, weak = false): number[] {
-    const scores: number[] = Array(Position.WIDTH).fill(Solver.INVALID_MOVE);
+  public analyze(P: Position, weak = false): bigint[] {
+    const scores: bigint[] = Array(Position.WIDTH).fill(Solver.INVALID_MOVE);
 
-    for (let col = 0; col < Position.WIDTH; col++)
+    for (let col = 0n; col < Position.WIDTH; col++)
       if (P.canPlay(col)) {
         if (P.isWinningMove(col)) {
-          scores[col] =
-            (Position.WIDTH * Position.HEIGHT + 1 - P.nbMoves()) / 2;
+          scores[Number(col)] =
+            (Position.WIDTH * Position.HEIGHT + 1n - P.nbMoves()) / 2n;
         } else {
-          const P2: Position = Position.clone(P);
-          P2.playCol(col);
-          scores[col] = -this.solve(P2, weak);
+          const P2n: Position = Position.clone(P);
+          P2n.playCol(col);
+          scores[Number(col)] = -this.solve(P2n, weak);
         }
       }
 
     return scores;
   }
 
-  public getNodeCount(): number {
+  public getNodeCount(): bigint {
     return this.nodeCount;
   }
 
   public reset(): void {
-    this.nodeCount = 0;
+    this.nodeCount = 0n;
     this.transTable.reset();
   }
 

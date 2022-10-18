@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Position from "../game/Position";
 
 interface BoardProps {
@@ -14,7 +14,6 @@ const getBoardRepresentation = (
 
   const getPositionCol = (col: bigint): string => {
     const n = (boardState >> (col * BigInt(7))) & BigInt(0x3f);
-    console.log("n", n);
     const rowStr = n.toString(2).padStart(7, "0");
 
     return rowStr;

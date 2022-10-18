@@ -1,8 +1,8 @@
 import Position from "./Position";
 
 interface MoveEntry {
-  move: number;
-  score: number;
+  move: bigint;
+  score: bigint;
 }
 
 /**
@@ -21,16 +21,16 @@ class MoveSorter {
    * Build an empty container
    */
   constructor() {
-    this.size = 0;
-    this.entries = Array(Position.WIDTH).fill({ move: 0, score: 0 });
+    this.size = 0n;
+    this.entries = Array(Number(Position.WIDTH)).fill({ move: 0n, score: 0n });
   }
 
   /**
    * Add a move in the container with its score.
    * You cannot add more than Position.WIDTH moves
    */
-  public add(move: number, score: number): void {
-    let pos: number = this.size++;
+  public add(move: bigint, score: bigint): void {
+    let pos = Number(this.size++);
     while (
       pos > 0 &&
       pos <= this.entries.length &&
@@ -48,22 +48,22 @@ class MoveSorter {
    * @return next remaining move with max score and remove it from the container.
    * If no more move is available return 0
    */
-  public getNext(): number {
+  public getNext(): bigint {
     if (this.size > 0 && this.size <= this.entries.length) {
-      return this.entries[--this.size].move;
+      return this.entries[Number(--this.size)].move;
     }
-    return 0;
+    return 0n;
   }
 
   /**
    * reset (empty) the container
    */
   public reset(): void {
-    this.size = 0;
+    this.size = 0n;
   }
 
-  // number of stored moves
-  private size: number;
+  // bigint of stored moves
+  private size: bigint;
 
   // Contains size moves with their score ordered by score
   private entries: MoveEntry[];

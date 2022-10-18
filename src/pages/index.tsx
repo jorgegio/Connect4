@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Board from "../components/board";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   return (
@@ -16,7 +16,12 @@ const Home: NextPage = () => {
           Connect 4
         </h1>
         <p className="text-2xl text-gray-700">Developed by Jorge Giovannetti</p>
-        <Board />
+        <Link href="/play">
+          <button>Player vs Player</button>
+        </Link>
+        <Link href="/play">
+          <button>Player vs Bot</button>
+        </Link>
       </main>
     </>
   );

@@ -86,14 +86,14 @@ class Position {
   }
 
   /*
-   * Plays a sequence of successive played columns, mainly used to initilize a board.
+   * Plays a sequence of successive played columns, mainly used to initialize a board.
    * @param seq: a sequence of digits corresponding to the 1-based index of the column played.
    *
-   * @return bigint of played moves. Processing will stop at first invalid move that can be:
+   * @return number of played moves. Processing will stop at first invalid move that can be:
    *           - invalid character (non digit, or digit >= WIDTH)
    *           - playing a column that is already full
    *           - playing a column that makes an alignment (we only solve non).
-   *         Caller can check if the move sequence was valid by comparing the bigint of
+   *         Caller can check if the move sequence was valid by comparing the number of
    *         processed moves to the length of the sequence.
    */
   public play_seq(seq: string): bigint {
@@ -119,7 +119,7 @@ class Position {
   }
 
   /**
-   * @return bigint of moves played from the beginning of the game.
+   * @return number of moves played from the beginning of the game.
    */
   public nbMoves(): bigint {
     return this.moves;
@@ -160,7 +160,7 @@ class Position {
   }
 
   /**
-   * Return a bitmap of all the possible next moves the do not lose in one turn.
+   * Return a bitmap of all the possible next moves that do not lose in one turn.
    * A losing move is a move leaving the possibility for the opponent to win directly.
    *
    * Warning this function is intended to test position where you cannot win in one turn
@@ -188,7 +188,7 @@ class Position {
    *
    * @param move, a possible move given in a bitmap format.
    *
-   * The score we are using is the bigint of winning spots
+   * The score we are using is the number of winning spots
    * the current player has after playing the move.
    */
   public moveScore(move: bigint): bigint {
@@ -235,7 +235,7 @@ class Position {
 
   private current_position: bigint; // bitmap of the current_player stones
   private mask: bigint; // bitmap of all the already played spots
-  private moves: bigint; // bigint of moves played since the beginning of the game.
+  private moves: bigint; // number of moves played since the beginning of the game.
 
   /**
    * Compute a partial base 3 key for a given column

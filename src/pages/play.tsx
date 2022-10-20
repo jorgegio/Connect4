@@ -8,13 +8,13 @@ import Position from "../game/Position";
 const Play: NextPage = () => {
   const [position, setPosition] = useState<Position>(new Position());
   const [isGameOver, setIsGameOver] = useState(false);
-  const [positionKey, setPositionKey] = useState(0n);
+  const [positionKey, setPositionKey] = useState(Position.bottom_mask);
   const [isTied, setIsTied] = useState(false);
 
   const resetGame = () => {
     setPosition(new Position());
     setIsGameOver(false);
-    setPositionKey(0n);
+    setPositionKey(Position.bottom_mask);
     setIsTied(false);
   };
 
@@ -71,7 +71,7 @@ const Play: NextPage = () => {
           </button>
         </div>
         {isGameOver ? displayGameOver() : null}
-        <Board positionKey={positionKey} makeMove={playCol} />
+        <Board positionKey={positionKey} nbMoves={position.nbMoves()} makeMove={playCol} />
       </main>
     </>
   );

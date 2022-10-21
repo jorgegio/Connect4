@@ -4,7 +4,7 @@ import TranspositionTable from "./TranspositionTable";
 
 class Solver {
   constructor() {
-    this.transTable = new TranspositionTable();
+    this.transTable = new TranspositionTable(8388593); //8388593 prime = 64MB of transposition table
     // this.book =
     this.nodeCount = 0n;
     this.columnOrder = [];

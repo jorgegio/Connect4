@@ -8,11 +8,13 @@ interface Entry {
  * In case of collision we keep the last entry and overide the previous one.
  */
 class TranspositionTable {
-  constructor() {
-    this.T = [];
+  constructor(size: number) {
+    this.T = Array(size).fill({key: 0, value: 0});
+    this.size = size;
   }
 
   private T: Entry[];
+  private readonly size: number;
 
   private index(key: bigint): bigint {
     return key % BigInt(this.T.length);
@@ -22,7 +24,7 @@ class TranspositionTable {
    * Empty the Transition Table.
    */
   public reset(): void {
-    this.T = [];
+    this.T = Array(this.size).fill({key: 0, value: 0});
   }
 
   /**

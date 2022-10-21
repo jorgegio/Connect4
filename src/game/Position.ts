@@ -142,7 +142,7 @@ class Position {
    * to make an alignment.
    */
   public possibleNonLosingMoves(): bigint {
-    if (!this.canWinNext()) throw new Error("No non-losing move possible");
+    if (this.canWinNext()) throw new Error("No non-losing move possible");
 
     let possible_mask: bigint = this.possible();
     const opponent_win: bigint = this.opponent_winning_position();

@@ -4,9 +4,11 @@ import Link from "next/link";
 import { ReactNode, useState } from "react";
 import Board from "../components/Board";
 import Position from "../game/Position";
+import Solver from "../game/Solver";
 
 const Play: NextPage = () => {
   const [position, setPosition] = useState<Position>(new Position());
+  const [solver, setSolver] = useState<Solver>(new Solver());
   const [isGameOver, setIsGameOver] = useState(false);
   const [positionKey, setPositionKey] = useState(Position.bottom_mask);
   const [isTied, setIsTied] = useState(false);
@@ -31,6 +33,24 @@ const Play: NextPage = () => {
     }
 
     position.playCol(col);
+    setPositionKey(position.key());
+
+    const analyzedMoves = solver.analyze(position);
+    console.log("Solver says", analyzedMoves);
+    const bestMove = analyzedMoves.reduce((iMax, x, i, arr) => (x >= arr[iMax] ? i : iMax), 0);
+    console.log(
+      "Solver says best play col",
+      bestMove
+    );
+
+    if (position.isWinningMove(BigInt(bestMove))) {
+      setIsGameOver(true);
+    } else if (position.nbMoves() + 1n >= Position.WIDTH * Position.HEIGHT) {
+      setIsTied(true);
+      setIsGameOver(true);
+    }
+
+    position.playCol(BigInt(bestMove));
     setPositionKey(position.key());
   };
 
@@ -71,7 +91,11 @@ const Play: NextPage = () => {
           </button>
         </div>
         {isGameOver ? displayGameOver() : null}
-        <Board positionKey={positionKey} nbMoves={position.nbMoves()} makeMove={playCol} />
+        <Board
+          positionKey={positionKey}
+          nbMoves={position.nbMoves()}
+          makeMove={playCol}
+        />
       </main>
     </>
   );

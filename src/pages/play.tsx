@@ -9,53 +9,54 @@ import Solver from "../game/Solver";
 const Play: NextPage = () => {
   const [position, setPosition] = useState<Position>(new Position());
   const [solver, setSolver] = useState<Solver>(new Solver());
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [positionKey, setPositionKey] = useState(Position.bottom_mask);
-  const [isTied, setIsTied] = useState(false);
 
   const resetGame = () => {
     setPosition(new Position());
-    setIsGameOver(false);
-    setPositionKey(Position.bottom_mask);
-    setIsTied(false);
   };
 
-  const playCol = (col: bigint) => {
-    if (isGameOver || !position.canPlay(col)) {
+  const playColAI = () => {
+    const analyzedMoves = solver.analyze(position);
+    const col = BigInt(
+      analyzedMoves.reduce((iMax, x, i, arr) => (x >= arr[iMax] ? i : iMax), 0)
+    );
+
+    if (position.isGameOver() || !position.canPlay(col)) {
       return;
     }
 
-    if (position.isWinningMove(col)) {
-      setIsGameOver(true);
-    } else if (position.nbMoves() + 1n >= Position.WIDTH * Position.HEIGHT) {
-      setIsTied(true);
-      setIsGameOver(true);
+    position.playCol(col);
+    setPosition(Position.clone(position));
+  };
+
+  const playCol = (col: bigint) => {
+    if (position.isGameOver() || !position.canPlay(col)) {
+      return;
     }
 
     position.playCol(col);
-    setPositionKey(position.key());
+    setPosition(Position.clone(position));
 
     const analyzedMoves = solver.analyze(position);
-    console.log("Solver says", analyzedMoves);
-    const bestMove = analyzedMoves.reduce((iMax, x, i, arr) => (x >= arr[iMax] ? i : iMax), 0);
-    console.log(
-      "Solver says best play col",
-      bestMove
+    const bestMove = analyzedMoves.reduce(
+      (iMax, x, i, arr) => (x >= arr[iMax] ? i : iMax),
+      0
     );
 
-    if (position.isWinningMove(BigInt(bestMove))) {
-      setIsGameOver(true);
-    } else if (position.nbMoves() + 1n >= Position.WIDTH * Position.HEIGHT) {
-      setIsTied(true);
-      setIsGameOver(true);
-    }
-
-    position.playCol(BigInt(bestMove));
-    setPositionKey(position.key());
+    playColAI();
   };
 
+  // const playCol = (col: bigint, isAI = false) => {
+  //   const winningPieces = position.winningPieces();
+
+  //   if(winningPieces) {
+  //     setIsGameOver(true);
+  //     return;
+  //   }
+
+  // }
+
   const displayGameOver = (): ReactNode => {
-    if (isTied) {
+    if (!position.winningPieces()) {
       return (
         <div className="text-3xl font-extrabold leading-normal text-gray-700 md:text-[2rem]">
           It was a tie!
@@ -64,7 +65,7 @@ const Play: NextPage = () => {
     }
     return (
       <div className="text-3xl font-extrabold leading-normal text-gray-700 md:text-[2rem]">
-        Player {Number(position.nbMoves() + 1n) % 2} has won!
+        Player {Number(position.nbMoves() + 1n) % 2 ? "🔴" : "🟡"} has won!
       </div>
     );
   };
@@ -90,12 +91,8 @@ const Play: NextPage = () => {
             Restart
           </button>
         </div>
-        {isGameOver ? displayGameOver() : null}
-        <Board
-          positionKey={positionKey}
-          nbMoves={position.nbMoves()}
-          makeMove={playCol}
-        />
+        {position.isGameOver() ? displayGameOver() : null}
+        <Board position={position} solver={solver} makeMove={playCol} />
       </main>
     </>
   );

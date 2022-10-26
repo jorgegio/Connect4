@@ -127,7 +127,7 @@ class Position {
     }
 
     let key_reverse = 0n;
-    for (let i: bigint = Position.WIDTH; i--;) {
+    for (let i: bigint = Position.WIDTH; i--; ) {
       key_reverse = this.partialKey3(key_reverse, i); // compute key in decreasing order of columns
     }
     return key_forward < key_reverse ? key_forward / 3n : key_reverse / 3n; // take the smallest key and divide per 3 as the last base3 digit is always 0
@@ -205,6 +205,63 @@ class Position {
         Position.column_mask(col)) !==
       0n
     );
+  }
+
+  public isGameOver(): boolean {
+    return (
+      this.moves + 1n >= Position.WIDTH * Position.HEIGHT ||
+      this.winningPieces() !== 0n
+    );
+  }
+
+  public winningPieces(): bigint {
+    const position = this.current_position ^ this.mask;
+
+    // check \ diagonal
+    const diag1 = position & (position >> Position.HEIGHT);
+    if (diag1 & (diag1 >> (2n * Position.HEIGHT))) {
+      let pieces = diag1 & (diag1 >> (2n * Position.HEIGHT));
+
+      pieces |= pieces << Position.HEIGHT;
+      pieces |= pieces << (2n * Position.HEIGHT);
+
+      return pieces;
+    }
+
+    // check horizontal -
+    const hori = position & (position >> (Position.HEIGHT + 1n));
+    if (hori & (hori >> (2n * (Position.HEIGHT + 1n)))) {
+      let pieces = hori & (hori >> (2n * (Position.HEIGHT + 1n)));
+
+      pieces |= pieces << (Position.HEIGHT + 1n);
+      pieces |= pieces << (2n * (Position.HEIGHT + 1n));
+
+      return pieces;
+    }
+
+    // check / diagonal
+    const diag2 = position & (position >> (Position.HEIGHT + 2n));
+    if (diag2 & (diag2 >> (2n * (Position.HEIGHT + 2n)))) {
+      let pieces = diag2 & (diag2 >> (2n * (Position.HEIGHT + 2n)));
+
+      pieces |= pieces << (Position.HEIGHT + 2n);
+      pieces |= pieces << (2n * (Position.HEIGHT + 2n));
+
+      return pieces;
+    }
+
+    // check vertical
+    const vert = position & (position >> 1n);
+    if (vert & (vert >> 2n)) {
+      let pieces = vert & (vert >> 2n);
+
+      pieces |= pieces << 1n;
+      pieces |= pieces << 2n;
+
+      return pieces;
+    }
+
+    return 0n;
   }
 
   private current_position: bigint; // bitmap of the current_player stones
@@ -332,17 +389,17 @@ class Position {
 
   // return a bitmask containg a single 1 corresponding to the top cel of a given column
   private static top_mask_col(col: bigint): bigint {
-    return 1n << ((Position.HEIGHT - 1n) + col * (Position.HEIGHT + 1n));
+    return 1n << (Position.HEIGHT - 1n + col * (Position.HEIGHT + 1n));
   }
 
   // return a bitmask containg a single 1 corresponding to the bottom cell of a given column
   private static bottom_mask_col(col: bigint): bigint {
-    return 1n << col * (Position.HEIGHT + 1n);
+    return 1n << (col * (Position.HEIGHT + 1n));
   }
 
   // return a bitmask 1 on all the cells of a given column
   public static column_mask(col: bigint): bigint {
-    return ((1n << Position.HEIGHT) - 1n) << col * (Position.HEIGHT + 1n);
+    return ((1n << Position.HEIGHT) - 1n) << (col * (Position.HEIGHT + 1n));
   }
 }
 

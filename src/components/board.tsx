@@ -1,19 +1,23 @@
 import { ReactNode } from "react";
 import Position from "../game/Position";
+import Solver from "../game/Solver";
 
 interface BoardProps {
-  readonly positionKey: bigint;
-  readonly nbMoves: bigint;
+  readonly position: Position;
+  readonly solver: Solver;
   readonly makeMove: (col: bigint) => void;
 }
 
-const Board: React.FC<BoardProps> = ({ positionKey, nbMoves, makeMove }) => {
+const Board: React.FC<BoardProps> = ({ position, solver, makeMove }) => {
   const boardRepresentation: ReactNode[] = [];
 
-  const getPositionCol = (col: bigint): ReactNode => {
-    const n = (positionKey >> (col * Position.WIDTH)) & BigInt(0x7f); // 0x7f => 0111 1111
+  const analyzedMoves = solver.analyze(position);
+  const winningPieces = position.winningPieces();
 
-    let height = Position.WIDTH;
+  const getPositionCol = (col: bigint): ReactNode => {
+    const n = (position.key() >> (col * (Position.HEIGHT + 1n))) & 0x7fn; // 0x7f => 0111 1111
+
+    let height = Position.HEIGHT + 1n;
     let pos = n;
 
     while (height && pos === n) {
@@ -24,7 +28,12 @@ const Board: React.FC<BoardProps> = ({ positionKey, nbMoves, makeMove }) => {
     const stonesToRender = Array(Number(Position.HEIGHT)).fill("✖");
 
     for (let i = 0n; i < height; i++) {
-      const element = (pos & 1n) === nbMoves % 2n ? "🔴" : "🟡";
+      let element = (pos & 1n) === position.nbMoves() % 2n ? "🔴" : "🟡";
+
+      if (winningPieces & (1n << (col * (Position.HEIGHT + 1n) + i))) {
+        element = (pos & 1n) === position.nbMoves() % 2n ? "❌" : "🌟";
+      }
+
       stonesToRender[Number(Position.HEIGHT - 1n - i)] = element;
       pos >>= 1n;
     }
@@ -32,10 +41,13 @@ const Board: React.FC<BoardProps> = ({ positionKey, nbMoves, makeMove }) => {
     return (
       <div className="container flex flex-col px-4">
         {stonesToRender.map((cell, index) => (
-          <div key={index} className="text-xl text-center font-semibold">
+          <div key={index} className="text-center text-xl font-semibold">
             {cell.toString()}
           </div>
         ))}
+        <div className="bg-green-300">
+          {analyzedMoves[Number(col)]?.toString() ?? "N/A"}
+        </div>
       </div>
     );
   };

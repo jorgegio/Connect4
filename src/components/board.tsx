@@ -45,7 +45,15 @@ const Board: React.FC<BoardProps> = ({ position, solver, makeMove }) => {
             {cell.toString()}
           </div>
         ))}
-        <div className="bg-green-300">
+        <div
+          className={
+            analyzedMoves[Number(col)] === 0n
+              ? "bg-gray-300"
+              : analyzedMoves[Number(col)] > 0n
+              ? "bg-green-300"
+              : "bg-red-300"
+          }
+        >
           {analyzedMoves[Number(col)]?.toString() ?? "N/A"}
         </div>
       </div>

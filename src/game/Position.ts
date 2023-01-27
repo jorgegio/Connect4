@@ -207,13 +207,21 @@ class Position {
     );
   }
 
+  /**
+   *
+   * @return true if game is over
+   */
   public isGameOver(): boolean {
     return (
-      this.moves + 1n >= Position.WIDTH * Position.HEIGHT ||
+      this.moves >= Position.WIDTH * Position.HEIGHT ||
       this.winningPieces() !== 0n
     );
   }
 
+  /**
+   *
+   * @return a bitmap of all the winning spots making an alignment
+   */
   public winningPieces(): bigint {
     const position = this.current_position ^ this.mask;
 

@@ -31,11 +31,7 @@ class MoveSorter {
    */
   public add(move: bigint, score: bigint): void {
     let pos = Number(this.size++);
-    while (
-      pos > 0 &&
-      pos <= this.entries.length &&
-      this.entries[pos - 1].score > score
-    ) {
+    while (pos > 0 && this.entries[pos - 1].score > score) {
       this.entries[pos] = this.entries[pos - 1];
       --pos;
     }

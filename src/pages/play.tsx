@@ -8,21 +8,20 @@ import Solver from "../game/Solver";
 
 const Play: NextPage = () => {
   const [position, setPosition] = useState<Position>(new Position());
-  const [solver, setSolver] = useState<Solver>(new Solver());
+  const [solver] = useState<Solver>(new Solver());
 
   const resetGame = () => {
     setPosition(new Position());
   };
 
   const playColAI = () => {
-    const analyzedMoves = solver.analyze(position);
-    const col = BigInt(
-      analyzedMoves.reduce((iMax, x, i, arr) => (x >= arr[iMax] ? i : iMax), 0)
-    );
-
-    if (position.isGameOver() || !position.canPlay(col)) {
+    if (position.isGameOver()) {
       return;
     }
+    const analyzedMoves = solver.analyze(position);
+    const col = BigInt(
+      analyzedMoves.reduce((iMax, x, i, arr) => (x > arr[iMax] ? i : iMax), 0)
+    );
 
     position.playCol(col);
     setPosition(Position.clone(position));
@@ -36,24 +35,8 @@ const Play: NextPage = () => {
     position.playCol(col);
     setPosition(Position.clone(position));
 
-    const analyzedMoves = solver.analyze(position);
-    const bestMove = analyzedMoves.reduce(
-      (iMax, x, i, arr) => (x >= arr[iMax] ? i : iMax),
-      0
-    );
-
     playColAI();
   };
-
-  // const playCol = (col: bigint, isAI = false) => {
-  //   const winningPieces = position.winningPieces();
-
-  //   if(winningPieces) {
-  //     setIsGameOver(true);
-  //     return;
-  //   }
-
-  // }
 
   const displayGameOver = (): ReactNode => {
     if (!position.winningPieces()) {

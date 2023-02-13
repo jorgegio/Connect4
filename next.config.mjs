@@ -18,4 +18,16 @@ export default defineNextConfig({
     locales: ["en"],
     defaultLocale: "en",
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.iba/,
+      use: [
+        {
+          loader: "binary-loader",
+        },
+      ],
+    });
+
+    return config;
+  },
 });

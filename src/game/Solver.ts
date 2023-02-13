@@ -1,11 +1,16 @@
 import MoveSorter from "./MoveSorter";
+import OpeningBook from "./OpeningBook";
 import Position from "./Position";
 import TranspositionTable from "./TranspositionTable";
 
 class Solver {
   constructor() {
     this.transTable = new TranspositionTable(8388593); //8388593 prime = 64MB of transposition table
-    // this.book =
+    this.book = new OpeningBook(
+      Position.WIDTH,
+      Position.HEIGHT,
+      this.transTable
+    );
     this.nodeCount = 0n;
     this.columnOrder = [];
 
@@ -19,7 +24,7 @@ class Solver {
   public static readonly INVALID_MOVE: bigint = -1000n;
 
   private transTable: TranspositionTable;
-  //   private book: OpeningBook; // opening book
+  private book: OpeningBook; // opening book
   private nodeCount: bigint; // counter of explored nodes.
   private columnOrder: bigint[]; // column exploration order
 
@@ -69,7 +74,7 @@ class Solver {
     }
 
     const key: bigint = P.key();
-    const val = this.transTable.get(key);
+    let val: bigint = this.transTable.get(key);
     if (val) {
       if (val > Position.MAX_SCORE - Position.MIN_SCORE + 1n) {
         // we have an lower bound
@@ -89,8 +94,10 @@ class Solver {
     }
 
     // look for solutions stored in opening book
-    //   val = book.get(P);
-    //   if(val) return val + Position.MIN_SCORE - 1n;
+    val = this.book.get(P);
+    if (val) {
+      return val + Position.MIN_SCORE - 1n;
+    }
 
     const moves: MoveSorter = new MoveSorter();
     for (let i = Number(Position.WIDTH); i--; ) {
@@ -193,10 +200,6 @@ class Solver {
     this.nodeCount = 0n;
     this.transTable.reset();
   }
-
-  //   public loadBook(book_file: string): void {
-  //     this.book.load(book_file);
-  //   }
 }
 
 export default Solver;

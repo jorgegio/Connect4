@@ -28,20 +28,9 @@ class OpeningBook {
    */
   private async load() {
     console.log("inside load function");
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const book = require("./7x6_small.iba");
+    // const book = require("./7x6_small.iba");
 
     console.log("exiting load function");
-    // console.log("book value:", book);
-    // const fileReader = new FileReader();
-
-    // fileReader.onload = function () {
-    //   console.log("Reading 7x6_small.iba");
-    // };
-
-    // const blob = new Blob(book);
-
-    // fileReader.readAsBinaryString(blob);
   }
 
   public get(P: Position): bigint {

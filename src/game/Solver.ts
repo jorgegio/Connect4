@@ -1,24 +1,14 @@
 import MoveSorter from "./MoveSorter";
 import OpeningBook from "./OpeningBook";
 import Position from "./Position";
-import TranspositionTable from "./TranspositionTable";
+import { TranspositionTable } from "./TranspositionTable";
 
 class Solver {
   constructor() {
     this.transTable = new TranspositionTable(8388593); //8388593 prime = 64MB of transposition table
-    this.book = new OpeningBook(
-      Position.WIDTH,
-      Position.HEIGHT,
-      this.transTable
-    );
+    this.book = new OpeningBook();
     this.nodeCount = 0n;
-    this.columnOrder = [];
-
-    for (let i = 0n; i < Position.WIDTH; i++) {
-      // initialize the column exploration order, starting with center columns
-      this.columnOrder[Number(i)] =
-        Position.WIDTH / 2n + ((1n - 2n * (i % 2n)) * (i + 1n)) / 2n; // example for WIDTH=7: columnOrder = {3, 4, 2, 5, 1, 6, 0}
-    }
+    this.columnOrder = [3n, 4n, 2n, 5n, 1n, 6n, 0n]; // the column exploration order, starting with center columns
   }
 
   public static readonly INVALID_MOVE: bigint = -1000n;
@@ -26,7 +16,7 @@ class Solver {
   private transTable: TranspositionTable;
   private book: OpeningBook; // opening book
   private nodeCount: bigint; // counter of explored nodes.
-  private columnOrder: bigint[]; // column exploration order
+  public readonly columnOrder: bigint[]; // column exploration order
 
   /**
    * Recursively score connect4 position using negamax variant of alpha-beta algorithm.
@@ -119,7 +109,7 @@ class Solver {
       if (score >= beta) {
         this.transTable.put(
           key,
-          score + Position.MAX_SCORE - 2n * Position.MIN_SCORE + 2n
+          score + Position.MAX_SCORE - 2n * Position.MIN_SCORE + 2n,
         ); // save the lower bound of the position
         return score; // prune the exploration if we find a possible move better than what we were looking for.
       }
@@ -137,7 +127,7 @@ class Solver {
   /**
    *  Returns the score of a position
    */
-  public solve(P: Position, weak = false): bigint {
+  public solve(P: Position): bigint {
     // check if win in one move as the Negamax function does not support this case.
     if (P.canWinNext()) {
       return (Position.WIDTH * Position.HEIGHT + 1n - P.nbMoves()) / 2n;
@@ -146,10 +136,6 @@ class Solver {
     let min: bigint = -(Position.WIDTH * Position.HEIGHT - P.nbMoves()) / 2n;
     let max: bigint =
       (Position.WIDTH * Position.HEIGHT + 1n - P.nbMoves()) / 2n;
-    if (weak) {
-      min = -1n;
-      max = 1n;
-    }
 
     while (min < max) {
       // iteratively narrow the min-max exploration window
@@ -174,10 +160,10 @@ class Solver {
   /** Returns the score off all possible moves of a position as an array.
    * Returns INVALID_MOVE for unplayable columns
    */
-  public analyze(P: Position, weak = false): bigint[] {
-    const scores: bigint[] = Array(Position.WIDTH).fill(Solver.INVALID_MOVE);
+  public analyze(P: Position): bigint[] {
+    const scores: bigint[] = Array(Position.WIDTH);
 
-    for (let col = 0n; col < Position.WIDTH; col++)
+    for (let col = 0n; col < Position.WIDTH; col++) {
       if (P.canPlay(col)) {
         if (P.isWinningMove(col)) {
           scores[Number(col)] =
@@ -185,9 +171,12 @@ class Solver {
         } else {
           const P2: Position = Position.clone(P);
           P2.playCol(col);
-          scores[Number(col)] = -this.solve(P2, weak);
+          scores[Number(col)] = -this.solve(P2);
         }
+      } else {
+        scores[Number(col)] = Solver.INVALID_MOVE;
       }
+    }
 
     return scores;
   }

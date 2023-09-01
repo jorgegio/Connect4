@@ -7,3 +7,5 @@ Documentation to-do:
 - [ ] Explanation on usage of BigInt
   - [ ] Bitwise precision limited to 32-bits in javascript
   - [ ] Performance considerations
+- [ ] Opening Book
+  - [ ] considerations (no server-side)

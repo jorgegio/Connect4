@@ -15,13 +15,13 @@ const Home: NextPage = () => {
         <h1 className="text-5xl font-extrabold leading-normal text-gray-700 md:text-[5rem]">
           Connect 4
         </h1>
-        <p className="text-2xl text-gray-700">Developed by Jorge Giovannetti</p>
-        <Link href="/play">
+        <Link href="/play?pvp=1">
           <button>Player vs Player</button>
         </Link>
         <Link href="/play">
           <button>Player vs Bot</button>
         </Link>
+        <div className="text-center py-8 px-4">🐹 Made with ❤️ by Gio</div>
       </main>
     </>
   );

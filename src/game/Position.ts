@@ -51,10 +51,8 @@ class Position {
   public static readonly WIDTH: bigint = 7n; // width of the board
   public static readonly HEIGHT: bigint = 6n; // height of the board
 
-  public static readonly MIN_SCORE: bigint =
-    -(Position.WIDTH * Position.HEIGHT) / 2n + 3n;
-  public static readonly MAX_SCORE: bigint =
-    (Position.WIDTH * Position.HEIGHT + 1n) / 2n - 3n;
+  public static readonly MIN_SCORE: bigint = -18n; // -(Position.WIDTH * Position.HEIGHT) / 2n + 3n
+  public static readonly MAX_SCORE: bigint = 18n; // (Position.WIDTH * Position.HEIGHT + 1n) / 2n - 3n
 
   constructor() {
     this.current_position = 0n;
@@ -62,8 +60,26 @@ class Position {
     this.moves = 0n;
   }
 
+  public static fromString(str: string): Position {
+    const P: Position = new Position();
+    const pos = str.replace(/\D/g, "");
+
+    for (let i = 0; i < pos.length; i++) {
+      if (pos[i] >= "0" && pos[i] <= "0" + Position.WIDTH) {
+        const col = BigInt(pos.charCodeAt(i)-'0'.charCodeAt(0));
+        if(P.canPlay(col)) {
+          P.playCol(col);
+        } else {
+          return new Position();
+        }
+      }
+    }
+
+    return P;
+  }
+
   // Copy constructor
-  public static clone(P: Position) {
+  public static clone(P: Position): Position {
     const P2: Position = new Position();
     P2.current_position = P.current_position;
     P2.mask = P.mask;
@@ -79,7 +95,7 @@ class Position {
    *        only one bit of the bitmap should be set to 1
    *        the move should be a valid possible move for the current player
    */
-  public play(move: bigint) {
+  public play(move: bigint): void {
     this.current_position ^= this.mask;
     this.mask |= move;
     this.moves++;
@@ -167,7 +183,10 @@ class Position {
    */
   public moveScore(move: bigint): bigint {
     return Position.popcount(
-      Position.compute_winning_position(this.current_position | move, this.mask)
+      Position.compute_winning_position(
+        this.current_position | move,
+        this.mask,
+      ),
     );
   }
 
@@ -188,7 +207,7 @@ class Position {
    */
   public playCol(col: bigint): void {
     this.play(
-      (this.mask + Position.bottom_mask_col(col)) & Position.column_mask(col)
+      (this.mask + Position.bottom_mask_col(col)) & Position.column_mask(col),
     );
   }
 
@@ -307,7 +326,7 @@ class Position {
   private opponent_winning_position(): bigint {
     return Position.compute_winning_position(
       this.current_position ^ this.mask,
-      this.mask
+      this.mask,
     );
   }
 
@@ -324,8 +343,9 @@ class Position {
    */
   private static popcount(m: bigint): bigint {
     let c = 0n;
-    for (; m; c++) {
+    while (m) {
       m &= m - 1n;
+      c++;
     }
     return c;
   }
@@ -338,7 +358,7 @@ class Position {
    */
   private static compute_winning_position(
     position: bigint,
-    mask: bigint
+    mask: bigint,
   ): bigint {
     // vertical;
     let r: bigint = (position << 1n) & (position << 2n) & (position << 3n);
@@ -390,7 +410,7 @@ class Position {
 
   public static readonly bottom_mask: bigint = Position.bottom(
     Position.WIDTH,
-    Position.HEIGHT
+    Position.HEIGHT,
   );
   private static readonly board_mask: bigint =
     Position.bottom_mask * ((1n << Position.HEIGHT) - 1n);

@@ -1,17 +1,14 @@
 import { ReactNode } from "react";
 import Position from "../game/Position";
-import Solver from "../game/Solver";
 
 interface BoardProps {
   readonly position: Position;
-  readonly solver: Solver;
   readonly makeMove: (col: bigint) => void;
 }
 
-const Board: React.FC<BoardProps> = ({ position, solver, makeMove }) => {
+const Board: React.FC<BoardProps> = ({ position, makeMove }) => {
   const boardRepresentation: ReactNode[] = [];
 
-  const analyzedMoves = solver.analyze(position);
   const winningPieces = position.winningPieces();
 
   const getPositionCol = (col: bigint): ReactNode => {
@@ -39,25 +36,15 @@ const Board: React.FC<BoardProps> = ({ position, solver, makeMove }) => {
     }
 
     return (
-      <div className="container flex flex-col px-4">
+      <div className="min-w-max">
         {stonesToRender.map((cell, index) => (
-          <div key={index} className="text-center text-xl font-semibold">
-            {cell.toString()}
+          <div
+            key={index}
+            className="h-[1.25em] w-[1.25em] text-center text-7xl font-semibold"
+          >
+            {cell}
           </div>
         ))}
-        {height === Position.HEIGHT ? null : (
-          <div
-            className={
-              analyzedMoves[Number(col)] === 0n
-                ? "bg-gray-300"
-                : analyzedMoves[Number(col)] > 0n
-                ? "bg-green-300"
-                : "bg-red-300"
-            }
-          >
-            {analyzedMoves[Number(col)]?.toString() ?? "N/A"}
-          </div>
-        )}
       </div>
     );
   };
@@ -67,7 +54,7 @@ const Board: React.FC<BoardProps> = ({ position, solver, makeMove }) => {
       <div
         key={Number(col)}
         onClick={() => makeMove(col)}
-        className="select-none hover:bg-blue-400"
+        className="select-none rounded-xl p-2 hover:bg-blue-400"
       >
         {getPositionCol(col)}
       </div>
@@ -75,7 +62,7 @@ const Board: React.FC<BoardProps> = ({ position, solver, makeMove }) => {
   }
 
   return (
-    <div className="flex columns-7 bg-blue-500 font-mono">
+    <div className="flex columns-7 rounded-xl bg-blue-500 font-mono">
       {boardRepresentation}
     </div>
   );

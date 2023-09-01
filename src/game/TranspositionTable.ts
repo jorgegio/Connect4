@@ -1,4 +1,4 @@
-interface Entry {
+export interface TTableEntry {
   key: bigint;
   value: bigint;
 }
@@ -7,24 +7,24 @@ interface Entry {
  * Transposition Table is a simple hash map with fixed storage size.
  * In case of collision we keep the last entry and overide the previous one.
  */
-class TranspositionTable {
+export class TranspositionTable {
   constructor(size: number) {
-    this.T = Array(size).fill({key: 0, value: 0});
+    this.T = new Map<number, TTableEntry>();
     this.size = size;
   }
 
-  private T: Entry[];
+  private T: Map<number, TTableEntry>;
   private readonly size: number;
 
-  private index(key: bigint): bigint {
-    return key % BigInt(this.T.length);
+  private index(key: bigint): number {
+    return Number(key) % this.size;
   }
 
   /*
    * Empty the Transition Table.
    */
   public reset(): void {
-    this.T = Array(this.size).fill({key: 0, value: 0});
+    this.T.clear();
   }
 
   /**
@@ -34,8 +34,7 @@ class TranspositionTable {
    */
   public put(key: bigint, value: bigint): void {
     const i = Number(this.index(key));
-    this.T[i].key = key;
-    this.T[i].value = value;
+    this.T.set(i, { key, value });
   }
 
   /**
@@ -44,12 +43,11 @@ class TranspositionTable {
    * @return 8-bit value associated with the key if present, 0 otherwise.
    */
   public get(key: bigint): bigint {
-    const i = Number(this.index(key)); // compute the index position
-    if (this.T[i].key === key) {
-      return this.T[i].value; // and return value if key matches
+    const i = this.index(key); // compute the index position
+    const entry: TTableEntry | undefined = this.T.get(i);
+    if (entry?.key === key) {
+      return entry.value; // and return value if key matches
     }
     return 0n; // or 0 if missing entry
   }
 }
-
-export default TranspositionTable;

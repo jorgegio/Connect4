@@ -1,11 +1,19 @@
 import Position from "./Position";
-import TranspositionTable from "./TranspositionTable";
+import { TranspositionTable } from "./TranspositionTable";
+import book from "./tiny_book.json";
+import book_extras from "./manual_additions.json";
+
+interface BookFileData {
+  data: { key3: number; value: number }[];
+  depth: number;
+}
+
 
 class OpeningBook {
-  constructor(width: bigint, height: bigint, T: TranspositionTable) {
-    this.T = T;
-    this.width = width;
-    this.height = height;
+  constructor() {
+    this.T = new TranspositionTable(8388593); //8388593 prime = 64MB of transposition table
+    this.width = Position.WIDTH;
+    this.height = Position.HEIGHT;
     this.depth = -1;
     this.load();
   }
@@ -26,16 +34,22 @@ class OpeningBook {
    * - size key elements
    * - size value elements
    */
-  private async load() {
-    console.log("inside load function");
-    // const book = require("./7x6_small.iba");
+  private load() {
+    this.depth = (book as BookFileData).depth;
 
-    console.log("exiting load function");
+    (book as BookFileData).data.forEach((entry) => {
+      this.T.put(BigInt(entry.key3), BigInt(entry.value));
+    });
+    (book_extras as BookFileData).data.forEach((entry) => {
+      this.T.put(BigInt(entry.key3), BigInt(entry.value));
+    });
   }
 
   public get(P: Position): bigint {
     if (P.nbMoves() > this.depth) return 0n;
-    else return this.T.get(P.key3());
+    else {
+      return this.T.get(P.key3());
+    }
   }
 }
 

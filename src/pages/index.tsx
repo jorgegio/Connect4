@@ -14,6 +14,8 @@ const Home: NextPage = () => {
           content="Play connect 4 against a friend or bot!"
         />
         <meta property="og:image" content="/logo.png" />
+        <meta property="og:image:width" content="128" />
+        <meta property="og:image:height" content="128" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

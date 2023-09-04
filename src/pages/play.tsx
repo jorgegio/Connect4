@@ -78,11 +78,19 @@ const Play: NextPage = () => {
     <>
       <Head>
         <title>Connect 4 - Play</title>
-        <meta name="description" content="Connect 4" />
+        <meta name="og:title" content="Connect 4" />
+        <meta
+          name="og:description"
+          content={`Play connect 4 against a ${isPvp ? "friend" : "bot"}!`}
+        />
+        <meta property="og:image" content="<generated>" />
+        <meta property="og:image:type" content="<generated>" />
+        <meta property="og:image:width" content="<generated>" />
+        <meta property="og:image:height" content="<generated>" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-        <h1 className="md:text-[3 rem] text-2xl font-extrabold leading-normal text-gray-700">
+        <h1 className="md:text-[3 rem] mb-2 text-2xl font-extrabold leading-normal text-gray-700">
           Player vs {isPvp ? "Player" : "Bot"}
         </h1>
         <div className="mb-4 flex space-x-4">

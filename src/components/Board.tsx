@@ -40,7 +40,7 @@ const Board: React.FC<BoardProps> = ({ position, makeMove }) => {
         {stonesToRender.map((cell, index) => (
           <div
             key={index}
-            className="h-[1.25em] w-[1.25em] text-center text-7xl font-semibold"
+            className="h-[1.25em] w-[1.25em] text-center sm:text-3xl md:text-7xl font-semibold"
           >
             {cell}
           </div>

@@ -83,7 +83,7 @@ const Play: NextPage = () => {
           name="og:description"
           content={`Play connect 4 against a ${isPvp ? "friend" : "bot"}!`}
         />
-        <meta property="og:image" content="../../public/logo.png" />
+        <meta property="og:image" content="/../../public/logo.png" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">

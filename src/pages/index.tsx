@@ -13,7 +13,7 @@ const Home: NextPage = () => {
           name="og:description"
           content="Play connect 4 against a friend or bot!"
         />
-        <meta property="og:image" content="../../public/logo.png" />
+        <meta property="og:image" content="/logo.png" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

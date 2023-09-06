@@ -83,7 +83,7 @@ For example, if it’s your turn and you already know that you can have a score 
 #### Null Window
 A [Null Window](https://www.chessprogramming.org/Null_Window) is a way to reduce the search space in alpha-beta like search algorithms, to perform a boolean test, whether a move produces a worse or better score than a passed value.
 
-This techniques uses a minimal size window `[alpha; alpha+1]` to test if the score of a position is higher or lower than alpha. An output lower or equal than alpha will tell us that the actual score is lower or equal than alpha. An output higher than alpha will tell us that the actual score is higher than alpha. Having a very narrow windows allow more pruning and faster answer.
+This technique uses a minimal size window `[alpha; alpha+1]` to test if the score of a position is higher or lower than alpha. An output lower or equal than alpha will tell us that the actual score is lower or equal than alpha. An output higher than alpha will tell us that the actual score is higher than alpha. Having very narrow windows allows more pruning and faster results.
 
 ### Move Exploration Order
 To improve the exploration order a static column order strategy is used, exploring center columns first and edge columns at the end. \
@@ -100,4 +100,4 @@ All of the bitboard logic for the game has been implemented using BigInt types, 
 ### Client-side Opening Book
 The opening book used for this implementation has been greatly reduced in size to allow offline play (at the cost of having a smaller pool of known moves for the solver to work off of).
 
-Ideally the game would be implemented with a server-side Solver, which would greatly reduce the network footprint for the client by avoiding loading the opening book locally. However, it was a design decision to set this up to work offline as a fun, small project.
+Ideally the game would be implemented with a server-side Solver, which would greatly reduce the network footprint for the client by avoiding loading the opening book locally. However, the focus of this small project is the solver itself. The web client works well to showcase the connect 4 bitboard logic and solver implementations, which is enough for the scope of this project.
